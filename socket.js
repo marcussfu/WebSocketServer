@@ -73,7 +73,9 @@ let streamServer = require('http').createServer( function(request, response) {
 		var path = 'recordings/' + Date.now() + '.ts';
 		request.socket.recording = fs.createWriteStream(path);
 	}
-}).listen(STREAM_PORT);
+})
+
+streamServer.listen(STREAM_PORT);
 
 console.log('Listening for incomming MPEG-TS Stream on http://127.0.0.1:'+STREAM_PORT+'/<secret>');
 console.log('Awaiting WebSocket connections on ws://127.0.0.1:'+WEBSOCKET_PORT+'/');

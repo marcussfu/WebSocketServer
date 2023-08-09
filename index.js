@@ -25,6 +25,11 @@ socketServer.on('connection', function(socket, upgradeReq) {
 		(upgradeReq || socket.upgradeReq).headers['user-agent'],
 		'('+socketServer.connectionCount+' total)'
 	);
+
+	socket.on ('message', data => {
+		socketServer.broadcast(data);
+	})
+
 	socket.on('close', function(code, message){
 		socketServer.connectionCount--;
 		console.log(
@@ -36,6 +41,7 @@ socketServer.on('connection', function(socket, upgradeReq) {
 socketServer.broadcast = function(data) {
 	socketServer.clients.forEach(function each(client) {
 		if (client.readyState === WebSocket.OPEN) {
+			console.log("broadcast message:", data);
 			client.send(data);
 		}
 	});
@@ -77,7 +83,9 @@ let streamServer = http.createServer( function(request, response) {
 		var path = 'recordings/' + Date.now() + '.ts';
 		request.socket.recording = fs.createWriteStream(path);
 	}
-}).listen(STREAM_PORT);
+})
+
+streamServer.listen(STREAM_PORT);
 
 console.log('Listening for incomming MPEG-TS Stream on http://127.0.0.1:'+STREAM_PORT+'/<secret>');
 console.log('Awaiting WebSocket connections on ws://127.0.0.1:'+WEBSOCKET_PORT+'/');
